@@ -241,3 +241,4 @@ Before generating, verify:
 - [ ] Every "✅ DO" has a real file example
 - [ ] Every "❌ DON'T" references a real anti-pattern or legacy file
 - [ ] Pre-PR checks are single copy-paste commands
+- [ ] NEVER commit files to git without explicit permission
