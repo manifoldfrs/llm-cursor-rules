@@ -241,4 +241,6 @@ Before generating, verify:
 - [ ] Every "✅ DO" has a real file example
 - [ ] Every "❌ DON'T" references a real anti-pattern or legacy file
 - [ ] Pre-PR checks are single copy-paste commands
+- [ ] All `rm*` and `rm -rf*` commands require explicit permission
+- [ ] NEVER stage files to git without explicit permission
 - [ ] NEVER commit files to git without explicit permission
