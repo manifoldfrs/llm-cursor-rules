@@ -14,67 +14,6 @@ You are going to help me create a **hierarchical AGENTS.md system** for this cod
 
 ## Tooling / MCP
 
-All agents MUST use RepoPrompt for any repository interaction (reads, writes, edits, search, selection, and context building). Do not use shell commands or non-RepoPrompt tools for file operations unless explicitly instructed. When you need web information, always use Tavily; when you need documentation, always use Ref.
-
-### RepoPrompt MCP (mandatory for repo reads/writes)
-
-Use these tools exclusively for local file access and context management:
-
-- `RepoPrompt_read_file` — Read file contents (use for any file read).
-- `RepoPrompt_apply_edits` — Apply changes via search/replace or full rewrite (use for all edits).
-- `RepoPrompt_manage_selection` — Build and manage the file selection used for context.
-- `RepoPrompt_file_actions` — Create, delete, or move files (use instead of shell `rm`, `mv`, `cp`).
-- `RepoPrompt_file_search` — Search file contents and paths.
-- `RepoPrompt_get_file_tree` — Inspect directory structure.
-- `RepoPrompt_get_code_structure` — Get codemap signatures for files.
-- `RepoPrompt_workspace_context` — Snapshot prompt, selection, and code structure.
-- `RepoPrompt_prompt` — Get or update shared prompt text.
-- `RepoPrompt_context_builder` — Auto-select files and build context; use for larger tasks.
-- `RepoPrompt_chat_send` — Send questions/requests to the RepoPrompt chat with current selection.
-- `RepoPrompt_chats` — List or inspect chat sessions.
-- `RepoPrompt_list_models` — List available models for `RepoPrompt_chat_send`.
-- `RepoPrompt_manage_workspaces` — Manage workspaces, windows, and tabs.
-
-If a task involves reading or writing files, use the RepoPrompt tools above; do not use `cat`, `sed`, `grep`, `find`, or direct shell file edits.
-
-### rp-cli (RepoPrompt CLI front-end)
-
-Use `rp-cli` when you need to drive RepoPrompt from the shell. It executes the same RepoPrompt MCP tools and should be treated as the CLI entrypoint for RepoPrompt operations. This is especially useful for long running tools like `context_builder`.
-
-**Routing rules (mandatory when multiple windows exist):**
-1. Run `rp-cli -e 'windows'` to list available windows.
-2. Always pass `-w <id>` on EVERY invocation.
-3. Use `-t <tab>` to target a compose tab for context-sensitive commands (chat/selection/etc).
-4. There is no persistent binding; every command must include `-w` and, when needed, `-t`.
-
-**Core invocation patterns:**
-- `rp-cli -e '<command>'` — run a single command.
-- `rp-cli -e '<cmd1> && <cmd2>'` — chain commands.
-- `rp-cli -w <id> -t <tab> -e '<command>'` — target window + tab.
-- `rp-cli -l` — list all available MCP tools.
-- `rp-cli -d <command>` — show detailed command help.
-- `rp-cli --json '{"key":"value"}'` or `-j` — pass JSON args to a command.
-- `rp-cli --raw-json` — return raw JSON output (for scripting).
-
-**Available rp-cli commands and tool aliases (use these exact names):**
-- `manage_selection` (alias `select`)
-- `context_builder` (alias `builder`)
-- `chat_send`
-- `chats`
-- `read_file` (aliases `read`, `cat`)
-- `file_search` (aliases `search`, `grep`)
-- `get_file_tree` (alias `tree`)
-- `get_code_structure` (alias `structure`)
-- `workspace_context` (alias `context`)
-- `prompt`
-- `apply_edits` (alias `edit`)
-- `file_actions` (alias `file`)
-- `list_models` (alias `models`)
-- `manage_workspaces` (aliases `workspace`, `tabs`)
-- `windows` (lists RepoPrompt windows; maps to `list_windows`)
-- `tabs` or `workspace tabs` (list compose tabs)
-- `call <tool> {json}` — raw MCP tool call, useful for scripting.
-
 ### Tavily MCP (mandatory for web search)
 
 Use Tavily for all web searches and web content extraction:
