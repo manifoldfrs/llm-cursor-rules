@@ -1,266 +1,398 @@
+# Task: Analyze this repository and generate a hierarchical AGENTS.md system
 
-# Task: Analyze this codebase and generate a hierarchical AGENTS.md structure
+## Purpose
 
-## Context & Principles
+Create a high-signal AGENTS.md hierarchy that helps coding agents work safely,
+quickly, and with low token waste.
 
-You are going to help me create a **hierarchical AGENTS.md system** for this codebase. This is critical for AI coding agents to work efficiently with minimal token usage.
+This is not a one-shot file generation task.
+Use a gated workflow where understanding and planning happen before writing.
 
-### Core Principles:
-1. **Root AGENTS.md is LIGHTWEIGHT** - Only universal guidance, links to sub-files
-2. **Nearest-wins hierarchy** - Agents read the closest AGENTS.md to the file being edited
-3. **JIT (Just-In-Time) indexing** - Provide paths/globs/commands, NOT full content
-4. **Token efficiency** - Small, actionable guidance over encyclopedic documentation
-5. **Sub-folder AGENTS.md files have MORE detail** - Specific patterns, examples, commands
+## Core principle
+
+Never generate final AGENTS.md files until a written plan is reviewed and
+explicitly approved.
+
+## Workflow map (authoritative)
+
+Use this exact flow:
+
+`Research -> Plan -> Annotate (repeat 1-6x) -> Todo list -> Implement ->`
+`Feedback & Iterate`
+
+Important:
+
+- `repeat 1-6x` applies to the annotate loop only.
+- Advance to todo list only when `Satisfied? = Yes`.
+- Finish only when `Correct? = Yes` and `More tasks? = No`.
+
+---
+
+## Context and hierarchy principles
+
+1. **Root AGENTS.md is lightweight**
+   - Universal rules, navigation, and links to deeper files.
+2. **Nearest-wins hierarchy**
+   - The closest AGENTS.md to edited files should carry most specificity.
+3. **JIT indexing over content dumping**
+   - Prefer paths, globs, and search commands over large pasted examples.
+4. **Token efficiency**
+   - Use concise, actionable instructions.
+5. **Sub-folder detail**
+   - Sub-folder AGENTS.md files hold local patterns and examples.
+
+---
 
 ## Tooling / MCP
 
-### Tavily MCP (mandatory for web search)
+### Tavily MCP (mandatory for web research)
 
-Use Tavily for all web searches and web content extraction:
-- `tavily_tavily_search` — general or domain-specific web search.
-- `tavily_tavily_extract` — extract content from specific URLs.
-- `tavily_tavily_crawl` — crawl multiple pages on a site.
-- `tavily_tavily_map` — map a site’s URL structure.
+Use Tavily for web search and extraction:
 
-Do not use other web search or scraping tools unless explicitly instructed.
+- `tavily_tavily_search`
+- `tavily_tavily_extract`
+- `tavily_tavily_crawl`
+- `tavily_tavily_map`
+
+Do not use other web search/scraping tools unless explicitly instructed.
 
 ### Ref MCP (mandatory for documentation lookup)
 
-Use Ref for documentation and API reference discovery:
-- `Ref_ref_search_documentation` — search documentation sources.
-- `Ref_ref_read_url` — read a specific documentation URL.
+Use Ref for documentation and API references:
 
-Always search with Ref first, then read the URL returned by Ref; avoid generic web fetch tools for documentation.
+- `Ref_ref_search_documentation`
+- `Ref_ref_read_url`
 
-## Your Process
+Search with Ref first, then read the returned URL.
 
-### Phase 1: Repository Analysis
-First, analyze the codebase structure and provide me with:
+### RepoPrompt MCP (if available, strongly recommended)
 
-1. **Repository type**: Monorepo, multi-package, or simple single project?
-2. **Primary technology stack**: Languages, frameworks, key tools
-3. **Major directories/packages** that should have their own AGENTS.md:
-   - Apps (e.g., `apps/web`, `apps/api`, `apps/mobile`)
-   - Services (e.g., `services/auth`, `services/transcribe`)
-   - Packages/libs (e.g., `packages/ui`, `packages/shared`)
-   - Workers/jobs (e.g., `workers/queue`, `workers/cron`)
-   
-4. **Build system**: pnpm/npm/yarn workspaces? Turborepo? Lerna? Or simple?
-5. **Testing setup**: Jest, Vitest, Playwright, pytest? Where are tests?
-6. **Key patterns to document**:
-   - Code organization patterns
-   - Important conventions (naming, styling, commits)
-   - Critical files that serve as good examples
-   - Anti-patterns to avoid
+When `RepoPrompt_*` tools are present, use them for deterministic context:
 
-Present this as a **structured map** before generating any AGENTS.md files.
+1. Bind workspace/tab first.
+2. Build minimal selection (`slices` when possible).
+3. Use context-aware planning/review loops.
+
+Do not rely on ambiguous active-tab state during long runs.
 
 ---
 
-### Phase 2: Generate Root AGENTS.md
+## Non-negotiable rules
 
-Create a **lightweight root AGENTS.md** (~100-200 lines max) that includes:
-
-#### Required Sections:
-
-**1. Project Snapshot** (3-5 lines)
-- Repo type (monorepo/simple)
-- Primary tech stack
-- Note that sub-packages have their own AGENTS.md files
-
-**2. Root Setup Commands** (5-10 lines)
-- Install dependencies (root level)
-- Build all
-- Typecheck all  
-- Test all
-
-**3. Universal Conventions** (5-10 lines)
-- Code style (TypeScript strict? Prettier? ESLint?)
-- Commit format (Conventional Commits?)
-- Branch strategy
-- PR requirements
-
-**4. Security & Secrets** (3-5 lines)
-- Never commit tokens
-- Where secrets go (.env patterns)
-- PII handling if applicable
-
-**5. JIT Index - Directory Map** (10-20 lines)
-Structure like:
-```
-## JIT Index (what to open, not what to paste)
-
-### Package Structure
-- Web UI: `apps/web/` → [see apps/web/AGENTS.md](apps/web/AGENTS.md)
-- API: `apps/api/` → [see apps/api/AGENTS.md](apps/api/AGENTS.md)
-- Auth service: `services/auth/` → [see services/auth/AGENTS.md](services/auth/AGENTS.md)
-- Shared packages: `packages/**/` → [see packages/README.md for details]
-
-### Quick Find Commands
-- Search for a function: `rg -n "functionName" apps/** packages/**`
-- Find a component: `rg -n "export.*ComponentName" apps/web/src`
-- Find API routes: `rg -n "export const (GET|POST)" apps/api`
-```
-
-**6. Definition of Done** (3-5 lines)
-- What must pass before a PR is ready
-- Minimal checklist
+1. **MUST** write deep findings to `research.md` before planning.
+2. **MUST** write a detailed `plan.md` before implementation.
+3. **MUST** keep assumptions/unknowns explicit and status-labeled.
+4. **MUST** keep using `do not implement yet` in annotation loops.
+5. **MUST NOT** generate AGENTS.md files before explicit approval.
+6. **MUST** infer commands from repository evidence.
+7. **MUST NOT** invent stack-specific commands without evidence.
+8. **MUST NOT** stage or commit files unless explicitly requested.
 
 ---
 
-### Phase 3: Generate Sub-Folder AGENTS.md Files
+## Your process
 
-For EACH major package/directory identified in Phase 1, create a **detailed AGENTS.md** that includes:
+### Phase 1: deep repository research (output: `research.md`)
 
-#### Required Sections:
+Study the codebase deeply before planning any file output.
 
-**1. Package Identity** (2-3 lines)
-- What this package/app/service does
-- Primary tech/framework for THIS package
+`research.md` must include:
 
-**2. Setup & Run** (5-10 lines)
-- Install command (if different from root)
-- Dev server command
-- Build command
-- Test command
-- Lint/typecheck commands
+1. Repository type (single project, monorepo, multi-package, etc.).
+2. Primary stack and tooling actually present.
+3. Candidate folders that need their own AGENTS.md files.
+4. Build/lint/test commands that really exist.
+5. Naming/style/convention patterns and anti-patterns.
+6. Risks, constraints, protected files, and dangerous operations.
+7. Assumptions and unknowns (`verified` vs `unverified`).
 
-**3. Patterns & Conventions** (10-20 lines)
-**THIS IS THE MOST IMPORTANT SECTION**
-- File organization rules (where things go)
-- Naming conventions specific to this package
-- Preferred patterns with **file examples**:
-  ```
-  - ✅ DO: Use functional components like `src/components/Button.tsx`
-  - ❌ DON'T: Use class components like `src/legacy/OldButton.tsx`
-  - ✅ Forms: Copy pattern from `src/components/forms/ContactForm.tsx`
-  - ✅ API calls: Use `src/lib/api/client.ts` wrapper, see example in `src/hooks/useUser.ts`
-  ```
+Quality bar:
 
-**4. Touch Points / Key Files** (5-10 lines)
-Point to the most important files to understand this package:
-```
-- Auth logic: `src/auth/provider.tsx`
-- API client: `src/lib/api.ts`  
-- Types: `src/types/index.ts`
-- Config: `src/config.ts`
+- Deep, file-grounded findings.
+- Concrete paths and examples.
+- No generic stack assumptions.
+
+Example prompt pattern:
+
+```text
+Read this repository in depth and write all findings in research.md.
+Cover architecture, commands, conventions, risks, and unknowns.
+Do not plan or implement yet.
 ```
 
-**5. JIT Index Hints** (5-10 lines)
-Specific search commands for this package:
-```
-- Find a React component: `rg -n "export function .*" src/components`
-- Find a hook: `rg -n "export const use" src/hooks`
-- Find route handlers: `rg -n "export async function (GET|POST)" src/app`
-- Find tests: `find . -name "*.test.ts"`
+Definition of done for Phase 1:
+
+- `research.md` exists and is concrete.
+- Critical unknowns are resolved or clearly escalated.
+
+---
+
+### Phase 2: planning (output: `plan.md`)
+
+Create a file-by-file AGENTS hierarchy plan based on `research.md`.
+
+`plan.md` must include:
+
+1. Target AGENTS.md file tree (root + sub-folders).
+2. For each file: purpose, audience, and level of detail.
+3. Required sections per file.
+4. Real command strategy by scope (root vs package-local).
+5. Cross-link strategy between AGENTS files.
+6. Trade-offs and deduplication approach.
+7. Verification strategy and rollback plan.
+8. Assumptions and unknowns log.
+
+Example prompt pattern:
+
+```text
+Using research.md and repository files, write a detailed plan.md for the
+AGENTS.md hierarchy. Include file-by-file scope and validation strategy.
+Do not implement yet.
 ```
 
-**6. Common Gotchas** (3-5 lines, if applicable)
-- "Auth requires `NEXT_PUBLIC_` prefix for client-side use"
-- "Always use `@/` imports for absolute paths"
-- "Database migrations must be run before tests: `pnpm db:migrate`"
+Definition of done for Phase 2:
 
-**7. Pre-PR Checks** (2-3 lines)
-Package-specific command to run before creating a PR:
-```
-pnpm --filter @repo/web typecheck && pnpm --filter @repo/web test && pnpm --filter @repo/web build
+- `plan.md` exists and is reviewable.
+- Scope and quality checks are explicit.
+
+---
+
+### Phase 2b: annotation cycle (repeat 1-6x)
+
+Run this loop until plan quality is accepted:
+
+1. Draft/update `plan.md`.
+2. User adds inline notes.
+3. Address every note point-by-point.
+4. Rewrite `plan.md`.
+5. Decision: `Satisfied?`
+   - No -> loop back.
+   - Yes -> continue.
+
+Hard guard:
+
+- Include `do not implement yet` on every loop turn.
+
+Example prompt pattern:
+
+```text
+I added notes in plan.md. Address all notes and update the plan.
+Do not implement yet.
 ```
 
 ---
 
-### Phase 4: Special Considerations
+### Phase 2c: todo expansion (inside `plan.md`)
 
-For each AGENTS.md file, also consider:
+Before writing AGENTS files, add a granular checklist:
 
-**A. Design System / UI Package**
-If there's a design system or UI library:
-```markdown
-## Design System
-- Components: `packages/ui/src/components/**`
-- Use design tokens from `packages/ui/src/tokens.ts` (never hardcode colors)
-- See component gallery: `pnpm --filter @repo/ui storybook`
-- Examples:
-  - Buttons: Copy `packages/ui/src/components/Button/Button.tsx`
-  - Forms: Copy `packages/ui/src/components/Input/Input.tsx`
+- file creation/update tasks,
+- cross-linking tasks,
+- validation tasks,
+- final quality checks.
+
+Example prompt pattern:
+
+```text
+Add a detailed todo list to plan.md with all phases and tasks.
+Do not implement yet.
 ```
 
-**B. Database / Data Layer**
-If there's a database service:
-```markdown
-## Database
-- ORM: Prisma / Drizzle / TypeORM
-- Schema: `prisma/schema.prisma`
-- Migrations: `pnpm db:migrate`
-- Seed: `pnpm db:seed`
-- **NEVER** run migrations in tests; use `test-db` script
-- Connection: via `src/lib/db.ts` singleton
+Definition of done for Phase 2c:
+
+- Todo list is explicit and execution-ready.
+
+---
+
+### No-implement gate (required stop)
+
+After todo expansion, stop and ask:
+
+`Approve implementation? (yes/no)`
+
+Do not generate final AGENTS.md artifacts before explicit approval.
+
+---
+
+### Phase 3: implementation (generate AGENTS files)
+
+After approval, execute the plan and mark todo items complete.
+
+Execution contract:
+
+```text
+Implement all planned AGENTS.md updates.
+Mark each completed task in plan.md.
+Do not stop until all tasks are complete.
+Keep output concise and avoid filler text.
+Run available checks after edits.
 ```
 
-**C. API / Backend Service**
-```markdown
-## API Patterns
-- REST routes: `src/routes/**/*.ts`
-- Auth middleware: `src/middleware/auth.ts` (apply to protected routes)
-- Validation: Use Zod schemas in `src/schemas/**`
-- Error handling: All errors thrown as `ApiError` from `src/lib/errors.ts`
-- Example endpoint: See `src/routes/users/get.ts` for full pattern
+Implementation rules:
+
+- Root AGENTS.md should stay lightweight (target: 100-200 lines).
+- Sub-folder AGENTS.md files should be more specific.
+- Keep instructions path-anchored and practical.
+- Do not add fictional commands or paths.
+
+---
+
+### Phase 4: feedback and iterate
+
+Use terse, directive corrections during execution.
+
+Loop:
+
+1. Review generated files.
+2. Decision gate: `Correct?`
+   - No -> terse correction -> apply updates.
+   - Yes -> continue.
+3. Decision gate: `More tasks?`
+   - Yes -> continue.
+   - No -> done.
+
+If direction drifts, prefer revert + narrow rescope + mini-plan refresh.
+
+---
+
+## Scope governance pass (pre-implementation)
+
+Before approval, triage each planned change item:
+
+- Accept as-is
+- Modify approach
+- Skip/remove
+- Override technical choice
+
+All decisions must converge into one refined implementation scope in `plan.md`.
+
+---
+
+## AGENTS.md content requirements
+
+### Root `AGENTS.md` (lightweight)
+
+Target length: ~100-200 lines.
+
+Required sections:
+
+1. Project snapshot.
+2. Root setup/validation commands.
+3. Universal conventions.
+4. Security and secrets handling.
+5. JIT index (directory map + quick find commands).
+6. Definition of done / pre-PR baseline.
+
+Requirements:
+
+- Link to sub-folder AGENTS.md files.
+- Keep root guidance universal and concise.
+- Avoid duplicating deep local rules from sub-files.
+
+### Sub-folder `AGENTS.md` files (detailed)
+
+For each major package/folder include:
+
+1. Package identity and purpose.
+2. Setup/run/validate commands.
+3. Patterns and conventions (most important section).
+4. Key touch points and reference files.
+5. JIT search hints.
+6. Common gotchas.
+7. Pre-PR checks for that package.
+
+Requirements:
+
+- Use real paths and real examples.
+- Include at least one concrete DO and one concrete DON'T where possible.
+- Keep package-specific details local to that file.
+
+### Special considerations (add only when applicable)
+
+- Design system packages.
+- Database/data-layer services.
+- API/backend services.
+- Testing-focused packages.
+
+Only include sections supported by repository evidence.
+
+---
+
+## RepoPrompt workflow (if available)
+
+Use this order:
+
+1. Bind to window/tab.
+2. Discover structure (`get_file_tree`, `file_search`, `read_file`).
+3. Build scoped selection (`manage_selection`, prefer `slices`).
+4. Use `workspace_context` to verify token budget.
+5. Use planning/review loops with explicit git context.
+
+Guardrails:
+
+- In multi-root workspaces, always scope paths explicitly.
+- Clear stale prompt context between unrelated tasks.
+
+---
+
+## Output format (two-pass)
+
+### Pass 1: research and planning only
+
+Return in this order:
+
+1. Analysis summary.
+2. `research.md`.
+3. `plan.md`.
+4. Updated `plan.md` after annotation loops.
+5. Todo-augmented `plan.md`.
+
+Then stop at the no-implement gate and ask for approval.
+
+### Pass 2: implementation artifacts (after approval)
+
+Return in this order:
+
+1. Root `AGENTS.md`.
+2. Each sub-folder `AGENTS.md` (one at a time, with file path).
+
+Format each file as:
+
+```text
+---
+File: `path/to/AGENTS.md`
+Purpose: short purpose line
+---
+[full content]
 ```
 
-**D. Testing Package**
-```markdown
-## Testing
-- Unit tests: `*.test.ts` colocated with source
-- Integration tests: `tests/integration/**`
-- E2E tests: `tests/e2e/**` (Playwright)
-- Run single test: `pnpm test -- path/to/file.test.ts`
-- Coverage: `pnpm test:coverage` (aim for >80%)
-- Mock external APIs using `src/test/mocks/**`
-```
+---
+
+## Constraints and quality checks
+
+Before finalizing, verify:
+
+- [ ] Root AGENTS.md is concise and under 200 lines.
+- [ ] Root links to all sub-AGENTS.md files.
+- [ ] Sub-files contain concrete examples with real paths.
+- [ ] Commands are copy-paste ready and repo-valid.
+- [ ] No unnecessary duplication across hierarchy levels.
+- [ ] JIT hints use actual repository patterns.
+- [ ] Pre-PR checks are explicit and runnable.
+- [ ] Dangerous operations require explicit permission.
+- [ ] No staging or committing without explicit user request.
+- [ ] Annotation and approval gates were followed.
 
 ---
 
-## Output Format
+## Start here
 
-Provide the files in this order:
+1. Perform deep repository research.
+2. Write `research.md`.
+3. Write `plan.md`.
+4. Run annotation loop until satisfied.
+5. Add todo list.
+6. Stop and request explicit approval.
+7. Only then generate AGENTS.md artifacts.
 
-1. **Analysis Summary** (from Phase 1)
-2. **Root AGENTS.md** (complete, ready to copy)
-3. **Each Sub-Folder AGENTS.md** (one at a time, with file path)
-
-For each file, use this format:
-
-```
----
-File: `AGENTS.md` (root)
----
-[full content here]
-
----
-File: `apps/web/AGENTS.md`  
----
-[full content here]
-
----
-File: `services/auth/AGENTS.md`
----
-[full content here]
-```
-
----
-
-## Constraints & Quality Checks
-
-Before generating, verify:
-
-- [ ] Root AGENTS.md is under 200 lines
-- [ ] Root links to all sub-AGENTS.md files
-- [ ] Each sub-file has concrete examples (actual file paths)
-- [ ] Commands are copy-paste ready (no placeholders unless unavoidable)
-- [ ] No duplication between root and sub-files
-- [ ] JIT hints use actual patterns from the codebase (ripgrep, find, glob)
-- [ ] Every "✅ DO" has a real file example
-- [ ] Every "❌ DON'T" references a real anti-pattern or legacy file
-- [ ] Pre-PR checks are single copy-paste commands
-- [ ] All `rm*` and `rm -rf*` commands require explicit permission
-- [ ] NEVER stage files to git without explicit permission
-- [ ] NEVER commit files to git without explicit permission
+Do not skip gates.

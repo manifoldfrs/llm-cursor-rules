@@ -1,748 +1,485 @@
-# Task: Analyze this codebase and generate a hierarchical CLAUDE.md system optimized for Claude Code
+# Task: Analyze this codebase and generate a hierarchical CLAUDE.md system
 
-## Critical Context: Claude Code is Different from Other Agents
+## Critical context: Claude Code is different from generic agents
 
-Claude Code has unique capabilities that set it apart from generic AGENTS.md:
+Claude Code has platform-specific behavior that should shape your output:
 
-1. **Strict Instruction Hierarchy**: CLAUDE.md content is treated as **immutable system rules** with strict priority over user prompts
-2. **Hierarchical Memory System**: Reads CLAUDE.md files recursively UP from CWD to root, AND discovers them in subdirectories
-3. **Hooks System**: Lifecycle hooks (PreToolUse, PostToolUse, UserPromptSubmit, Notification, Stop) for deterministic automation
-4. **Model Context Protocol (MCP)**: Native integration with external tools, databases, and APIs
-5. **Custom Slash Commands**: Repeatable workflows stored in `.claude/commands/`
-6. **Subagents**: Specialized agents with isolated context windows and tool permissions
-7. **Extended Thinking**: Can use long-form reasoning with extended context windows (1M+ tokens)
+1. **Instruction hierarchy**: `CLAUDE.md` is treated as high-priority guidance.
+2. **Hierarchical memory**: `CLAUDE.md` files are discovered across directories.
+3. **Hooks**: lifecycle automation via `.claude/settings.json`.
+4. **MCP support**: tool integration, including workspace-aware flows.
+5. **Custom commands**: reusable workflows in `.claude/commands/`.
+6. **Subagents**: isolated specialists for bounded tasks.
+7. **Long sessions**: large context windows with compaction behavior.
 
-## Core Principles
+Do not treat this as a one-shot text generation task.
+Treat it as a gated software-delivery workflow.
 
-1. **CLAUDE.md is AUTHORITATIVE** - Treated as system rules, not suggestions
-2. **Modular Sections** - Use clear markdown headers to prevent instruction bleeding
-3. **Front-load Critical Context** - Large CLAUDE.md files provide better instruction adherence
-4. **Hierarchical Strategy**: Root = universal rules; Subdirs = specific context
-5. **Token Efficiency Through Structure** - Use sections to keep related instructions together
-6. **Living Documentation** - Use `#` key during sessions to add memories organically
+## Core operating principle
 
----
+Never generate implementation artifacts until the written plan has been reviewed
+and explicitly approved.
 
-## Your Process
+For this task, implementation artifacts include:
 
-### Phase 1: Comprehensive Repository Analysis
+- `CLAUDE.md` files,
+- `.claude/settings.json`,
+- `.claude/commands/*.md`,
+- `.mcp.json` examples,
+- subagent config suggestions.
 
-Analyze the codebase and provide:
+## Workflow map (authoritative)
 
-**1. Repository Architecture**
-- Type: Monorepo, multi-package, or standard single project?
-- Tech stack: Primary languages, frameworks, build systems
-- Testing infrastructure: Frameworks, where tests live, coverage requirements
-- CI/CD: GitHub Actions, GitLab CI, custom pipelines?
+Use this exact flow:
 
-**2. Claude Code-Specific Analysis**
-Identify opportunities for:
-- **Hooks**: What should always run (formatting, linting, tests)?
-- **MCP Servers**: External tools needed (GitHub, Slack, databases, APIs)?
-- **Custom Commands**: Repeated workflows (deploy, migrate, review)?
-- **Subagents**: Specialized tasks (testing agent, review agent, docs agent)?
+`Research -> Plan -> Annotate (repeat 1-6x) -> Todo list -> Implement ->`
+`Feedback & Iterate`
 
-**3. Directory Structure for CLAUDE.md Files**
-Map where CLAUDE.md files should exist:
-```
-root/CLAUDE.md                    # Universal project rules
-apps/web/CLAUDE.md               # Next.js-specific guidance
-apps/api/CLAUDE.md               # API-specific patterns
-services/auth/CLAUDE.md          # Auth service specifics
-packages/ui/CLAUDE.md            # UI library patterns
-tests/CLAUDE.md                  # Testing-specific rules
-```
+Important:
 
-**4. Dangerous Patterns to Block**
-- Commands that should be blocked via hooks (rm -rf, force push, etc.)
-- Files that should never be edited (.env, secrets, prod configs)
-- Anti-patterns to warn against
-
-**5. Tool Permissions Strategy**
-- What tools should Claude have by default?
-- What requires explicit permission?
-- Security boundaries
-
-Present this analysis as a **structured map** before generating any files.
+- `repeat 1-6x` applies to the annotate loop, not the whole pipeline.
+- Only advance to todo list when `Satisfied? = Yes`.
+- Only finish implementation when `Correct? = Yes` and `More tasks? = No`.
 
 ---
 
-### Phase 2: Generate Root CLAUDE.md
+## Non-negotiable rules
 
-Create a **comprehensive root CLAUDE.md** (~200-400 lines) that serves as the constitution:
+1. **MUST** write deep findings to `research.md` before planning.
+2. **MUST** write a detailed `plan.md` before implementation.
+3. **MUST** include assumptions and unknowns in both files.
+4. **MUST** keep the guard phrase `do not implement yet` during annotation.
+5. **MUST NOT** generate final files before explicit approval.
+6. **MUST** update `plan.md` todo items as implementation progresses.
+7. **MUST** infer commands from the real repo, not from template assumptions.
+8. **MUST NOT** invent stack-specific commands when evidence is missing.
 
-#### Required Sections:
+---
 
-**1. Project Identity** (5-10 lines)
-```markdown
-# [Project Name]
+## Your process
 
-## Overview
-- **Type**: [Monorepo/Standard project]
-- **Stack**: [Primary technologies]
-- **Architecture**: [Brief architectural summary]
-- **Team Size**: [If relevant]
+### Phase 1: deep research (output: `research.md`)
 
-This CLAUDE.md is the authoritative source for development guidelines. 
-Subdirectories contain specialized CLAUDE.md files that extend these rules.
+Read the repository deeply and produce a persistent research artifact.
+Do not start planning until this file exists.
+
+`research.md` must include:
+
+1. Repository architecture and boundaries.
+2. Existing conventions and invariants.
+3. Tooling and validation commands that actually exist.
+4. Critical touch points and dependency relationships.
+5. Risks, unknowns, and assumptions (`verified` vs `unverified`).
+6. Dangerous operations and protected files.
+
+Research quality bar:
+
+- No shallow summaries.
+- Reference concrete files/paths/patterns.
+- Surface ambiguities early.
+
+Example prompt patterns:
+
+```text
+Read this area in depth. Understand how it works and write detailed
+findings in research.md.
+Do not plan or implement yet.
 ```
 
-**2. Universal Rules (MUST/SHOULD/MUST NOT)** (10-20 lines)
-Use clear RFC-2119 language with emphasis:
-```markdown
-## Universal Development Rules
-
-### Code Quality (MUST)
-- **MUST** write TypeScript in strict mode
-- **MUST** include tests for all new features
-- **MUST** run pre-commit hooks before committing
-- **MUST NOT** commit secrets, API keys, or tokens
-
-### Best Practices (SHOULD)  
-- **SHOULD** prefer functional components over class components
-- **SHOULD** use descriptive variable names (no single letters except loops)
-- **SHOULD** keep functions under 50 lines
-- **SHOULD** extract complex logic into separate functions
-
-### Anti-Patterns (MUST NOT)
-- **MUST NOT** use `any` type without explicit justification
-- **MUST NOT** bypass TypeScript errors with `@ts-ignore`
-- **MUST NOT** push directly to main branch
+```text
+Study this subsystem deeply, including edge cases and likely failure modes.
+Write everything you learn in research.md with concrete file references.
+Do not plan or implement yet.
 ```
 
-**3. Core Commands** (10-20 lines)
-```markdown
-## Core Commands
+Definition of done for Phase 1:
 
-### Development
-- `bun dev` - Start all development servers
-- `bun build` - Build all packages
-- `bun test` - Run all tests
-- `bun typecheck` - TypeScript validation across project
-- `bun lint` - ESLint all code
-- `bun lint:fix` - Auto-fix linting issues
+- `research.md` exists.
+- No unresolved critical unknowns remain.
+- Findings are concrete enough to support planning.
 
-### Package-Specific
-- `bun --filter @repo/web [command]` - Run command in web package
-- `bun --filter @repo/api [command]` - Run command in API package
+---
 
-### Quality Gates (run before PR)
-```bash
-bun typecheck && bun lint && bun test
-```
-```
+### Phase 2: planning (output: `plan.md`)
 
-**4. Project Structure Map** (15-30 lines)
-```markdown
-## Project Structure
+After research review, generate a detailed implementation plan.
+This plan is the review surface and source of truth.
 
-### Applications
-- **`apps/web/`** → Next.js frontend ([see apps/web/CLAUDE.md](apps/web/CLAUDE.md))
-  - Routes: `app/` directory (App Router)
-  - Components: `src/components/`
-  - Hooks: `src/hooks/`
-  
-- **`apps/api/`** → Express API ([see apps/api/CLAUDE.md](apps/api/CLAUDE.md))
-  - Routes: `src/routes/`
-  - Middleware: `src/middleware/`
-  - Models: `src/models/`
+`plan.md` must include:
 
-### Packages
-- **`packages/ui/`** → Shared UI components ([see packages/ui/CLAUDE.md](packages/ui/CLAUDE.md))
-- **`packages/shared/`** → Shared utilities and types
+1. Objective and business outcome.
+2. Scope in/out and protected interfaces.
+3. File-by-file change plan.
+4. Alternatives considered and trade-offs.
+5. Data/model/migration impact (if any).
+6. Verification strategy (tests, lint, typecheck, manual checks).
+7. Rollback and risk mitigation strategy.
+8. Assumptions and unknowns log.
 
-### Infrastructure
-- **`services/auth/`** → Authentication service ([see services/auth/CLAUDE.md](services/auth/CLAUDE.md))
-- **`.github/workflows/`** → CI/CD pipelines
+Plan quality bar:
 
-### Testing
-- Unit tests: Colocated with source (`*.test.ts`)
-- Integration: `tests/integration/`
-- E2E: `tests/e2e/` (Playwright)
+- Base recommendations on actual repository files.
+- Include concrete snippets where useful.
+- Avoid generic architecture advice disconnected from codebase reality.
+
+Example prompt patterns:
+
+```text
+Using research.md and source files, write a detailed plan.md for this change.
+Include touched files, trade-offs, and verification steps.
+Do not implement yet.
 ```
 
-**5. Quick Find Commands** (JIT Index) (10-15 lines)
-```markdown
-## Quick Find Commands
-
-### Code Navigation
-```bash
-# Find a component
-rg -n "export (function|const) .*Button" apps/web/src
-
-# Find API endpoint
-rg -n "export (async )?function (GET|POST)" apps/api/src
-
-# Find hook usage
-rg -n "use[A-Z]" apps/web/src
-
-# Find type definition
-rg -n "^export (type|interface)" packages/shared/src
+```text
+Write plan.md based on actual code in this repo.
+Include assumptions and open questions explicitly.
+Do not implement yet.
 ```
 
-### Dependency Analysis
-```bash
-# Check package dependencies
-bun why <package-name>
+Definition of done for Phase 2:
 
-# Find unused dependencies
-bunx depcheck
-```
-```
+- `plan.md` exists and is reviewable.
+- Scope and trade-offs are explicit.
+- Verification and rollback paths are explicit.
 
-**6. Security & Secrets** (5-10 lines)
-```markdown
-## Security Guidelines
+---
 
-### Secrets Management
-- **NEVER** commit tokens, API keys, or credentials
-- Use `.env.local` for local secrets (already in .gitignore)
-- Use environment variables for CI/CD secrets
-- PII must be redacted in logs
+### Phase 2b: annotation cycle (repeat 1-6x)
 
-### Safe Operations
-- Review generated bash commands before execution
-- Confirm before: git force push, rm -rf, database drops
-- Use staging environment for risky operations
-```
+Run this loop until plan quality is accepted.
 
-**7. Git Workflow** (5-10 lines)
-```markdown
-## Git Workflow
+Flow:
 
-- Branch from `main` for features: `feature/description`
-- Use Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`
-- PRs require: passing tests, type checks, lint, and 1 approval
-- Squash commits on merge
-- Delete branches after merge
-```
+1. Agent writes/updates `plan.md`.
+2. User reviews in editor and adds inline notes.
+3. Agent addresses each note point-by-point.
+4. Agent rewrites `plan.md` accordingly.
+5. Decision gate: `Satisfied?`
+   - No -> loop back.
+   - Yes -> continue to todo list.
 
-**8. Testing Strategy** (5-10 lines)
-```markdown
-## Testing Requirements
+Hard guard:
 
-- **Unit tests**: All business logic (aim for >80% coverage)
-- **Integration tests**: API endpoints and database operations  
-- **E2E tests**: Critical user paths
-- Run tests before committing (enforced by pre-commit hook)
-- New features require tests before review
-```
+- Every loop instruction includes: `do not implement yet`.
 
-**9. Available Tools** (5-10 lines)
-```markdown
-## Available Tools
+Example update prompt:
 
-You have access to:
-- Standard bash tools (rg, git, node, bun, etc.)
-- GitHub CLI (`gh`) for issues, PRs, releases
-- Database CLI (based on project needs)
-- [List any MCP servers configured]
-
-### Tool Permissions
-- ✅ Read any file
-- ✅ Write code files
-- ✅ Run tests, linters, type checkers
-- ❌ Edit .env files (ask first)
-- ❌ Force push (ask first)
-- ❌ Delete databases (ask first)
-```
-
-**10. Directory-Specific CLAUDE.md Files** (5-10 lines)
-```markdown
-## Specialized Context
-
-When working in specific directories, refer to their CLAUDE.md:
-- Frontend work: [apps/web/CLAUDE.md](apps/web/CLAUDE.md)
-- API development: [apps/api/CLAUDE.md](apps/api/CLAUDE.md)
-- UI components: [packages/ui/CLAUDE.md](packages/ui/CLAUDE.md)
-- Testing: [tests/CLAUDE.md](tests/CLAUDE.md)
-
-These files provide detailed, context-specific guidance.
+```text
+I added notes in plan.md. Address every note and update the document.
+Do not implement yet.
 ```
 
 ---
 
-### Phase 3: Generate Subdirectory CLAUDE.md Files
+### Phase 2c: todo expansion (inside `plan.md`)
 
-For EACH major package/directory, create a **detailed CLAUDE.md** (100-200 lines each):
+Before implementation, add a granular checklist with phases and tasks.
 
-#### Template Structure:
+Requirements:
 
-**1. Package Identity** (5 lines)
-```markdown
-# [Package Name] - [Purpose]
+- Tasks are actionable and ordered.
+- Include validation checkpoints.
+- Include status markers (pending/in_progress/completed).
 
-**Technology**: [Framework/language specific to this package]
-**Entry Point**: [Main file]
-**Parent Context**: This extends [../CLAUDE.md](../CLAUDE.md)
+Example prompt:
+
+```text
+Add a detailed todo list to plan.md with all phases and individual tasks.
+Do not implement yet.
 ```
 
-**2. Setup & Commands** (10-15 lines)
-```markdown
-## Development Commands
+Definition of done for Phase 2c:
 
-### This Package
-```bash
-# From package directory
-bun dev          # Start dev server
-bun build        # Build for production
-bun test         # Run tests
-bun test:watch   # Watch mode
-bun typecheck    # Type checking
-bun lint         # Lint code
-```
-
-### From Root
-```bash
-bun --filter @repo/package-name dev
-bun --filter @repo/package-name test
-```
-
-### Pre-PR Checklist
-```bash
-bun typecheck && bun lint && bun test && bun build
-```
-```
-
-**3. Architecture & Patterns** (20-40 lines) **MOST IMPORTANT**
-```markdown
-## Architecture
-
-### Directory Structure
-```
-src/
-├── components/        # React components
-│   ├── forms/        # Form components
-│   ├── layout/       # Layout components
-│   └── shared/       # Shared/common components
-├── hooks/            # Custom React hooks
-├── lib/              # Utilities and helpers
-├── types/            # TypeScript definitions
-└── styles/           # Global styles
-```
-
-### Code Organization Patterns
-
-#### Components
-- ✅ **DO**: Functional components with hooks
-  - Example: `src/components/Button/Button.tsx`
-  - Pattern: One component per file
-  - Co-locate tests: `Button.test.tsx`
-  
-- ❌ **DON'T**: Class components
-  - Legacy example: `src/legacy/OldButton.tsx` (avoid this pattern)
-
-#### State Management
-- ✅ Use Zustand for global state
-  - Example store: `src/stores/userStore.ts`
-  - Pattern: Create stores in `src/stores/`
-  - Hook pattern: `const user = useUserStore()`
-
-#### Data Fetching
-- ✅ Use TanStack Query (React Query)
-  - Example: `src/hooks/useUsers.ts`
-  - Pattern: Custom hooks for queries
-  - Mutations in same hook file
-
-#### Styling
-- ✅ Tailwind utility classes only
-- ✅ Use design tokens from `src/styles/tokens.ts`
-- ❌ **NEVER** hardcode colors, use tokens:
-  ```tsx
-  // ❌ DON'T
-  <div className="bg-blue-500">
-  
-  // ✅ DO
-  <div className="bg-primary">
-  ```
-
-#### Forms
-- ✅ Use React Hook Form + Zod validation
-  - Example: `src/components/forms/LoginForm.tsx`
-  - Schema pattern: `src/schemas/loginSchema.ts`
-```
-
-**4. Key Files & Touch Points** (10-15 lines)
-```markdown
-## Key Files
-
-### Core Files (understand these first)
-- `src/app/layout.tsx` - Root layout, providers
-- `src/lib/api/client.ts` - API client configuration
-- `src/types/index.ts` - Shared TypeScript types
-- `src/styles/tokens.ts` - Design system tokens
-
-### Authentication
-- `src/auth/provider.tsx` - Auth context provider
-- `src/middleware/auth.ts` - Auth middleware
-- `src/hooks/useAuth.ts` - Auth hook
-
-### Common Patterns
-- API calls: See `src/hooks/useUsers.ts` for pattern
-- Forms: Copy `src/components/forms/ContactForm.tsx`
-- Tables: Copy `src/components/tables/UserTable.tsx`
-```
-
-**5. JIT Search Hints** (10-15 lines)
-```markdown
-## Quick Search Commands
-
-### Find Components
-```bash
-# Find component definition
-rg -n "^export (function|const) .*Component" src/components
-
-# Find component usage
-rg -n "<ComponentName" src/
-
-# Find props interface
-rg -n "interface.*Props" src/components
-```
-
-### Find Hooks
-```bash
-# Custom hooks
-rg -n "export const use[A-Z]" src/hooks
-
-# Hook usage
-rg -n "use[A-Z].*=" src/
-```
-
-### Find Routes (Next.js App Router)
-```bash
-# Find route handlers
-rg -n "export async function (GET|POST|PUT|DELETE)" src/app
-
-# Find page components
-find src/app -name "page.tsx"
-```
-
-### Find Styles
-```bash
-# Find Tailwind usage
-rg -n "className=" src/ | grep -E "(bg-|text-|border-)"
-
-# Find inline styles (should be rare)
-rg -n "style=" src/
-```
-```
-
-**6. Common Gotchas** (5-10 lines)
-```markdown
-## Common Gotchas
-
-- **Environment Variables**: Client-side vars need `NEXT_PUBLIC_` prefix
-- **Absolute Imports**: Always use `@/` prefix for imports from `src/`
-- **Server Components**: Default in Next.js 13+, add `"use client"` only when needed
-- **Dynamic Routes**: Params are async in Next.js 15+
-- **Database Queries**: Always use transactions for multi-step operations
-- **File Uploads**: Max 10MB, check size before processing
-```
-
-**7. Package-Specific Testing** (10-15 lines)
-```markdown
-## Testing Guidelines
-
-### Unit Tests
-- Location: Colocated with source (`Component.test.tsx`)
-- Framework: Vitest + Testing Library
-- Pattern: Test user behavior, not implementation
-- Example: See `src/components/Button/Button.test.tsx`
-
-### Integration Tests
-- Location: `tests/integration/`
-- Test API integration, database operations
-- Use test database: `TEST_DATABASE_URL`
-
-### E2E Tests  
-- Location: `tests/e2e/`
-- Framework: Playwright
-- Run before major releases
-
-### Running Tests
-```bash
-# Run all tests
-bun test
-
-# Run specific file
-bun test src/components/Button/Button.test.tsx
-
-# Watch mode
-bun test:watch
-
-# Coverage
-bun test:coverage
-```
-```
-
-**8. Pre-PR Validation** (3-5 lines)
-```markdown
-## Pre-PR Checklist
-
-Run this command before creating a PR:
-```bash
-bun --filter @repo/package typecheck && \
-bun --filter @repo/package lint && \
-bun --filter @repo/package test && \
-bun --filter @repo/package build
-```
-
-All checks must pass + manual testing complete.
-```
+- Todo list is complete enough for uninterrupted execution.
 
 ---
 
-### Phase 4: Generate Claude Code-Specific Configuration
+### No-implement gate (required stop)
 
-**1. Hooks Configuration** (`.claude/settings.json`)
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit|MultiEdit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'Editing: $CLAUDE_FILE_PATHS'"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command", 
-            "command": "if [[ \"$CLAUDE_TOOL_INPUT\" == *\"rm -rf\"* ]]; then echo 'BLOCKED: Dangerous command' && exit 2; fi"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [[ \"$CLAUDE_FILE_PATHS\" =~ \\.(ts|tsx)$ ]]; then prettier --write \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true; fi"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [[ \"$CLAUDE_FILE_PATHS\" =~ \\.test\\.(ts|tsx)$ ]]; then bun test \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true; fi"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+After todo expansion, stop and ask for explicit approval.
 
-**2. Custom Slash Commands** (`.claude/commands/`)
+Required behavior:
 
-Create these command files:
-
-**`.claude/commands/review.md`**
-```markdown
-Perform a comprehensive code review of recent changes:
-
-1. Check code follows our TypeScript and React conventions from CLAUDE.md
-2. Verify proper error handling and loading states
-3. Ensure accessibility standards are met (ARIA labels, keyboard nav)
-4. Review test coverage for new functionality
-5. Check for security vulnerabilities (XSS, SQL injection, auth bypasses)
-6. Validate performance implications (bundle size, render cycles)
-7. Confirm documentation is updated
-
-Provide specific, actionable feedback with file/line references.
-```
-
-**`.claude/commands/fix-issue.md`**
-```markdown
-Analyze and fix GitHub issue: $ARGUMENTS
-
-Steps:
-1. Use `gh issue view $ARGUMENTS` to get issue details
-2. Understand the problem and requirements
-3. Search codebase for relevant files using `rg`
-4. Read CLAUDE.md in relevant directories for patterns
-5. Implement fix following established patterns
-6. Write/update tests to verify fix
-7. Run type checking and linting
-8. Create descriptive commit message
-9. Push and create PR with `gh pr create`
-
-Remember to follow our testing and code quality standards.
-```
-
-**`.claude/commands/migrate-db.md`**
-```markdown
-Create a database migration: $ARGUMENTS
-
-1. Create migration file: `bun db:migration:create "$ARGUMENTS"`
-2. Write migration up/down in generated file
-3. Review migration for safety (no data loss)
-4. Test migration: `bun db:migrate`
-5. Verify schema changes: `bun db:schema:inspect`
-6. Run tests to ensure compatibility
-7. Document breaking changes if any
-8. Commit migration file
-
-CRITICAL: Never run migrations on production without approval.
-```
-
-**3. MCP Server Recommendations**
-
-Based on the project, recommend MCP servers:
-
-```markdown
-## Recommended MCP Servers
-
-### For This Project
-```bash
-# GitHub integration (issues, PRs, repos)
-claude mcp add --scope user github -- bunx @modelcontextprotocol/server-github
-
-# Web search and documentation
-claude mcp add --scope user context7 -- bunx context7-mcp
-
-# Sequential thinking for complex decisions
-claude mcp add --scope user sequential-thinking -- bunx @modelcontextprotocol/server-sequential-thinking
-```
-
-### Project-Specific `.mcp.json`
-Create this file in project root (commit to git):
-```json
-{
-  "mcpServers": {
-    "github": {
-      "type": "stdio",
-      "command": "bunx",
-      "args": ["@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-      }
-    }
-  }
-}
-```
-```
-
-**4. Subagent Recommendations** (if applicable)
-
-```markdown
-## Suggested Subagents
-
-### Testing Agent (`.claude/agents/tester.json`)
-- **Purpose**: Run and debug tests
-- **Tools**: Read, Bash (test commands only)
-- **System Prompt**: Focused on test-driven development
-
-### Review Agent (`.claude/agents/reviewer.json`)
-- **Purpose**: Code review and quality checks
-- **Tools**: Read, Grep
-- **System Prompt**: Security, performance, best practices focus
-
-### Docs Agent (`.claude/agents/docs.json`)
-- **Purpose**: Generate and update documentation
-- **Tools**: Read, Write (docs only)
-- **System Prompt**: Clear, concise technical writing
-```
+- Do not generate target files yet.
+- Ask: `Approve implementation? (yes/no)`
+- Only proceed on explicit approval.
 
 ---
 
-## Output Format
+### Phase 3: implementation execution
 
-Provide files in this order:
+Once approved, execute the plan mechanically.
 
-1. **Analysis Summary** (Phase 1)
-2. **Root CLAUDE.md** (complete file)
-3. **Hooks Configuration** (`.claude/settings.json`)
-4. **Custom Commands** (each `.claude/commands/*.md` file)
-5. **Each Subdirectory CLAUDE.md** (with full path)
-6. **MCP Setup Guide** (commands to run)
-7. **Optional: Subagent Configurations**
+Standard execution contract:
 
-Format each file like:
+```text
+Implement it all.
+When you complete a task or phase, mark it completed in plan.md.
+Do not stop until all tasks and phases are completed.
+Do not add unnecessary comments or JSDoc.
+Do not use any or unknown types without explicit justification.
+Continuously run available checks (typecheck/lint/tests) to catch issues early.
 ```
----
-File: `CLAUDE.md` (root)
-Purpose: Universal project rules and navigation
----
-[full content]
+
+Implementation rules:
+
+- Plan is authoritative; do not freelance new scope.
+- If commands are unavailable, report closest repo-valid check.
+- Keep diffs scoped and deterministic.
+
+Definition of done for Phase 3:
+
+- All plan tasks marked complete.
+- Relevant checks pass (or blockers are explicitly documented).
 
 ---
-File: `apps/web/CLAUDE.md`
-Purpose: Next.js-specific development guidance
----
-[full content]
+
+### Phase 4: feedback and iterate
+
+After implementation begins, feedback should be short and directive.
+
+Loop behavior:
+
+1. `I review / test`
+2. Decision gate: `Correct?`
+   - No -> provide terse correction -> implement updates -> re-check
+   - Yes -> continue
+3. Decision gate: `More tasks?`
+   - Yes -> continue implementation
+   - No -> done
+
+Guidance:
+
+- Prefer terse corrections over long restatements.
+- Point to existing references for UI/UX parity.
+- Use screenshot feedback for visual alignment when relevant.
+
+Revert and rescope protocol:
+
+- If direction is wrong, prefer revert + narrow rescope.
+- Refresh `plan.md` mini-plan before re-implementation.
 
 ---
-File: `.claude/settings.json`
-Purpose: Hooks configuration for automation
+
+## Scope governance pass (before implementation)
+
+Before approval, triage each proposed change item:
+
+- Accept as-is
+- Modify approach
+- Skip/remove
+- Override technical choice
+
+All outcomes must converge into one refined implementation scope in `plan.md`.
+
+---
+
+## RepoPrompt MCP workflow (when available)
+
+If `RepoPrompt_*` tools are available, use them deliberately.
+
+### A) Deterministic context binding
+
+1. `RepoPrompt_list_windows`
+2. `RepoPrompt_select_window`
+3. `RepoPrompt_manage_workspaces` (`list_tabs` then `select_tab`)
+
+Why:
+
+- Prevent context drift from active-tab changes.
+- Keep long workflows reproducible.
+
+### B) Discovery and selection hygiene
+
+Use:
+
+- `RepoPrompt_get_file_tree`
+- `RepoPrompt_file_search`
+- `RepoPrompt_read_file`
+- `RepoPrompt_manage_selection`
+- `RepoPrompt_workspace_context`
+
+Rules:
+
+- Prefer `slices` over full-file selection for large files.
+- Keep prompt/selection lean to reduce token waste.
+- In multi-root workspaces, scope paths explicitly.
+
+### C) Planning and review flow with RepoPrompt chat
+
+Use:
+
+- `RepoPrompt_chat_send` mode `plan` for plan refinement.
+- `RepoPrompt_git` for status/diff/log.
+- `RepoPrompt_chat_send` mode `review` after git prep.
+
+Important nuance:
+
+- Review mode may require prepared git diff context.
+- Publish artifacts first for reliability when needed:
+  `RepoPrompt_git` with `artifacts: true`.
+
+### D) Context builder for broad tasks
+
+Use `RepoPrompt_context_builder` when task scope is uncertain or broad.
+It can auto-select relevant files and produce structured prompt context.
+
+---
+
+## Phase 5 deliverable target for this task
+
+For this specific generator task (hierarchical Claude system), implementation
+should produce these artifacts after approval:
+
+1. Root `CLAUDE.md`.
+2. Subdirectory `CLAUDE.md` files as needed.
+3. `.claude/settings.json` hooks configuration.
+4. `.claude/commands/*.md` command set.
+5. MCP setup recommendations (and optional `.mcp.json` example).
+6. Optional subagent recommendations.
+
+---
+
+## Root `CLAUDE.md` requirements
+
+Generate a comprehensive root file with these sections:
+
+1. Project identity and architecture snapshot.
+2. Universal MUST/SHOULD/MUST NOT rules.
+3. Core commands inferred from repo reality.
+4. Project structure map with links to sub-`CLAUDE.md` files.
+5. JIT quick-find commands based on real file patterns.
+6. Security and secrets policy.
+7. Git workflow.
+8. Testing strategy.
+9. Tool permissions.
+10. Specialized-context navigation.
+
+Constraint:
+
+- Do not claim commands or frameworks that are not evidenced in-repo.
+
+---
+
+## Subdirectory `CLAUDE.md` requirements
+
+For each major package/folder, include:
+
+1. Package identity and parent-context link.
+2. Setup/run commands for that package.
+3. Architecture and code organization patterns.
+4. Key files and touch points.
+5. JIT search hints for that package.
+6. Common gotchas.
+7. Package-specific pre-PR validation command.
+
+Keep examples concrete and path-based.
+
+---
+
+## Claude-specific config requirements
+
+### Hooks (`.claude/settings.json`)
+
+Define conservative automation first:
+
+- Pre-tool safety checks (dangerous commands, protected files).
+- Post-tool formatting/testing hooks with scoped matchers.
+
+Do not make hooks so broad they slow every operation.
+
+### Custom commands (`.claude/commands/`)
+
+Start with common workflows only (3-5 commands), for example:
+
+- review
+- fix-issue
+- migrate-db
+
+Each command should include validation steps and expected outputs.
+
+### MCP recommendations
+
+Recommend servers that match actual project needs.
+Avoid suggesting integrations with no clear use case.
+
+---
+
+## Output format (two-pass)
+
+### Pass 1 (research and planning only)
+
+Return in this order:
+
+1. Analysis summary.
+2. `research.md`.
+3. `plan.md`.
+4. Updated `plan.md` after annotation loops.
+5. Todo-augmented `plan.md`.
+
+Then stop at the no-implement gate and ask for approval.
+
+### Pass 2 (implementation artifacts after approval)
+
+Return in this order:
+
+1. Root `CLAUDE.md`.
+2. `.claude/settings.json`.
+3. `.claude/commands/*.md` files.
+4. Subdirectory `CLAUDE.md` files.
+5. MCP setup guide.
+6. Optional subagent configs.
+
+Format each file as:
+
+```text
+---
+File: `path/to/file`
+Purpose: short purpose line
 ---
 [full content]
 ```
 
 ---
 
-## Quality Checklist
+## Quality checklist
 
 Before finalizing, verify:
 
-- [ ] Root CLAUDE.md under 400 lines
-- [ ] All subdirectory CLAUDE.md files link back to root
-- [ ] Every "✅ DO" has a real file example with path
-- [ ] Every "❌ DON'T" references actual anti-pattern
-- [ ] Commands are copy-paste ready (no placeholders)
-- [ ] Hooks target specific patterns (not overly broad)
-- [ ] Custom commands use `$ARGUMENTS` correctly
-- [ ] JIT search commands use actual file patterns
-- [ ] Security rules clearly stated
-- [ ] Tool permissions explicitly defined
-- [ ] MCP servers appropriate for project needs
-- [ ] No duplication between hierarchy levels
+- [ ] Research quality is deep, path-grounded, and assumption-aware.
+- [ ] Plan quality includes trade-offs, risk, rollback, verification.
+- [ ] Annotation loop ran until `Satisfied? = Yes`.
+- [ ] Todo list exists before implementation.
+- [ ] No implementation started before explicit approval.
+- [ ] Implementation tracked task completion in `plan.md`.
+- [ ] Feedback loop used `Correct?` and `More tasks?` gates.
+- [ ] Root and sub-`CLAUDE.md` files avoid unsupported stack assumptions.
+- [ ] Commands are repo-valid and copy-paste ready.
+- [ ] Hooks are specific and not overly broad.
+- [ ] Security and dangerous-operation rules are explicit.
+- [ ] No duplication between hierarchy levels.
 
 ---
 
-## Claude Code-Specific Best Practices
+## Session strategy
 
-**Memory System**:
-- Use `#` during sessions to add memories organically
-- Review and refactor CLAUDE.md monthly
-- Keep sections modular to prevent instruction bleeding
+Prefer one continuous session across research, planning, and implementation.
+When context compacts, re-anchor on persistent artifacts:
 
-**Hooks Strategy**:
-- PreToolUse: Validation and safety checks
-- PostToolUse: Formatting, linting, auto-testing
-- Start conservative, expand based on needs
+- `research.md`
+- `plan.md`
 
-**Context Management**:
-- Use `/clear` between unrelated tasks
-- Use `/compact` for long sessions
-- Reference specific files with `@` rather than reading entire directories
-
-**Custom Commands**:
-- Start with 3-5 most common workflows
-- Use descriptive names (e.g., `/fix-issue`, not `/fi`)
-- Include validation steps in commands
+These files are the durable memory layer.
 
 ---
 
-## Start Here
+## Start here
 
-Begin by analyzing the codebase and presenting **Phase 1 (Repository Analysis)** as a structured map.
+1. Perform deep repository research.
+2. Write `research.md`.
+3. Write `plan.md`.
+4. Run annotation loops until approved.
+5. Add todo list.
+6. Stop and request explicit implementation approval.
 
-Ask clarifying questions about:
-- Which workflows should be automated with hooks?
-- What external tools need MCP integration?
-- Any specific security concerns or dangerous operations?
-- Team preferences for testing, linting, formatting?
-- Are there legacy patterns that should be explicitly warned against?
-- What are the most common repetitive tasks?
-
-Let's build a comprehensive, Claude Code-optimized CLAUDE.md hierarchy together.
+Do not skip gates.
